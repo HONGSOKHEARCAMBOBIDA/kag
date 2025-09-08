@@ -207,6 +207,13 @@
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
       margin-bottom: 20px;
       background: white;
+      max-width: 100%;
+    }
+    
+    .canvas-container canvas {
+      max-width: 100%;
+      height: auto;
+      display: block;
     }
     
     .text-label {
@@ -220,6 +227,10 @@
       padding: 5px;
       border: 1px dashed transparent;
       transition: var(--transition);
+      max-width: calc(100% - 40px);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     
     .text-label:hover {
@@ -239,6 +250,7 @@
       border: 1px solid #ced4da;
       border-radius: var(--border-radius);
       font-size: 1rem;
+      width: 100%;
     }
     
     .empty-state {
@@ -276,13 +288,36 @@
       transform: translateX(100%);
       transition: transform 0.3s ease;
       z-index: 1000;
+      max-width: 80%;
     }
     
     .notification.show {
       transform: translateX(0);
     }
     
+    /* Mobile Responsive Styles */
     @media (max-width: 768px) {
+      .container {
+        padding: 15px;
+      }
+      
+      header {
+        padding: 15px 0;
+        margin-bottom: 20px;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      .subtitle {
+        font-size: 1rem;
+      }
+      
+      .upload-section, .preview-section {
+        padding: 20px;
+      }
+      
       .controls-section {
         flex-direction: column;
         align-items: stretch;
@@ -291,6 +326,50 @@
       .text-controls {
         flex-wrap: wrap;
         justify-content: center;
+        margin-bottom: 15px;
+      }
+      
+      .button {
+        width: 100%;
+        margin-bottom: 10px;
+      }
+      
+      #preview {
+        gap: 20px;
+      }
+      
+      .canvas-container {
+        width: 100%;
+        padding: 10px;
+      }
+      
+      .text-label {
+        font-size: 18px;
+        top: 15px;
+        left: 15px;
+      }
+      
+      .section-title {
+        font-size: 1.3rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.8rem;
+      }
+      
+      .file-input-button {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+      }
+      
+      .text-style-input, .text-input {
+        font-size: 16px; /* Prevents zoom on iOS */
+      }
+      
+      .text-label {
+        font-size: 16px;
       }
     }
   </style>
@@ -415,17 +494,25 @@
         reader.onload = e => {
           const img = new Image();
           img.onload = () => {
-            // Create canvas with same dimensions as image
+            // Create canvas with dimensions optimized for mobile
             const canvas = document.createElement("canvas");
             const ctx = canvas.getContext("2d");
-            canvas.width = img.width;
-            canvas.height = img.height;
-            ctx.drawImage(img, 0, 0);
+            
+            // Calculate dimensions for mobile display
+            const maxWidth = Math.min(400, window.innerWidth - 60); // Account for padding
+            const ratio = maxWidth / img.width;
+            const displayWidth = maxWidth;
+            const displayHeight = img.height * ratio;
+            
+            canvas.width = displayWidth;
+            canvas.height = displayHeight;
+            
+            // Draw image on canvas with proper dimensions
+            ctx.drawImage(img, 0, 0, displayWidth, displayHeight);
             
             // Create container for canvas and controls
             const container = document.createElement("div");
             container.className = "canvas-container";
-            container.style.width = Math.min(canvas.width, 400) + "px";
             
             // Create draggable text element
             const textDiv = document.createElement("div");
@@ -467,7 +554,9 @@
               input, 
               img,
               originalWidth: img.width,
-              originalHeight: img.height
+              originalHeight: img.height,
+              displayWidth,
+              displayHeight
             });
           };
           img.src = e.target.result;
@@ -517,8 +606,9 @@
         const rect = textDiv.getBoundingClientRect();
         offsetX = touch.clientX - rect.left;
         offsetY = touch.clientY - rect.top;
+        textDiv.style.cursor = "grabbing";
         e.preventDefault();
-      });
+      }, { passive: false });
       
       document.addEventListener("touchmove", e => {
         if (!isDragging) return;
@@ -536,10 +626,11 @@
         textDiv.style.top = Math.max(0, Math.min(y, maxY)) + "px";
         
         e.preventDefault();
-      });
+      }, { passive: false });
       
       document.addEventListener("touchend", () => {
         isDragging = false;
+        textDiv.style.cursor = "grab";
       });
     }
     
@@ -562,24 +653,38 @@
         const padding = 10;
         
         items.forEach((item, index) => {
-          const { canvas, textDiv, input, img, originalWidth, originalHeight } = item;
-          const ctx = canvas.getContext("2d");
+          const { img, textDiv, input, originalWidth, originalHeight } = item;
           
-          // Clear and redraw image
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          // Create a temporary canvas with original dimensions for PDF quality
+          const tempCanvas = document.createElement("canvas");
+          const tempCtx = tempCanvas.getContext("2d");
+          tempCanvas.width = originalWidth;
+          tempCanvas.height = originalHeight;
           
-          // Calculate text position based on drag position
-          const textX = parseInt(textDiv.style.left) || 20;
-          const textY = parseInt(textDiv.style.top) || 20;
+          // Draw image on temp canvas
+          tempCtx.drawImage(img, 0, 0, originalWidth, originalHeight);
           
-          // Draw text on canvas
-          ctx.font = `${currentFontSize}px ${currentFont}`;
-          ctx.fillStyle = currentColor;
-          ctx.fillText(input.value || "Your Text", textX, textY);
+          // Calculate text position based on drag position (scaled from display to original)
+          const displayRect = item.canvas.getBoundingClientRect();
+          const textXDisplay = parseInt(textDiv.style.left) || 20;
+          const textYDisplay = parseInt(textDiv.style.top) || 20;
+          
+          // Scale text position from display size to original size
+          const scaleX = originalWidth / item.displayWidth;
+          const scaleY = originalHeight / item.displayHeight;
+          const textX = textXDisplay * scaleX;
+          const textY = textYDisplay * scaleY;
+          
+          // Scale font size for original image dimensions
+          const scaledFontSize = currentFontSize * scaleX;
+          
+          // Draw text on temp canvas
+          tempCtx.font = `${scaledFontSize}px ${currentFont}`;
+          tempCtx.fillStyle = currentColor;
+          tempCtx.fillText(input.value || "Your Text", textX, textY);
           
           // Convert to data URL
-          const imgData = canvas.toDataURL("image/jpeg", 0.9);
+          const imgData = tempCanvas.toDataURL("image/jpeg", 0.9);
           
           // Add to PDF
           if (index > 0) pdf.addPage();
@@ -639,5 +744,4 @@
     }
   </script>
 </body>
-
 </html>
