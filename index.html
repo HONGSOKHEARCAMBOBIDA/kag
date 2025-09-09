@@ -2,746 +2,142 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Image to PDF Converter | Professional Tool</title>
+  <title>Image to PDF with Text</title>
   <style>
-    :root {
-      --primary-color: #4361ee;
-      --secondary-color: #3a0ca3;
-      --accent-color: #f72585;
-      --light-color: #f8f9fa;
-      --dark-color: #212529;
-      --success-color: #4cc9f0;
-      --border-radius: 8px;
-      --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      --transition: all 0.3s ease;
-    }
-    
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      line-height: 1.6;
-      color: var(--dark-color);
-      background-color: #f5f7ff;
-      padding: 0;
-    }
-    
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    
-    header {
-      text-align: center;
-      margin-bottom: 30px;
-      padding: 20px 0;
-      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-      color: white;
-      border-radius: var(--border-radius);
-      box-shadow: var(--box-shadow);
-    }
-    
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: 10px;
-    }
-    
-    .subtitle {
-      font-size: 1.1rem;
-      opacity: 0.9;
-    }
-    
-    .upload-section {
-      background-color: white;
-      padding: 30px;
-      border-radius: var(--border-radius);
-      box-shadow: var(--box-shadow);
-      margin-bottom: 30px;
-      text-align: center;
-    }
-    
-    .file-input-wrapper {
-      position: relative;
-      display: inline-block;
-      margin-bottom: 20px;
-    }
-    
-    .file-input-wrapper input[type="file"] {
-      position: absolute;
-      left: 0;
-      top: 0;
-      opacity: 0;
-      width: 100%;
-      height: 100%;
-      cursor: pointer;
-    }
-    
-    .file-input-button {
-      display: inline-block;
-      padding: 12px 24px;
-      background-color: var(--primary-color);
-      color: white;
-      border-radius: var(--border-radius);
-      cursor: pointer;
-      transition: var(--transition);
-      font-weight: 600;
-    }
-    
-    .file-input-button:hover {
-      background-color: var(--secondary-color);
-      transform: translateY(-2px);
-    }
-    
-    .selected-files {
-      margin-top: 15px;
-      font-size: 0.9rem;
-      color: #666;
-    }
-    
-    .controls-section {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-      gap: 15px;
-    }
-    
-    .button {
-      padding: 12px 24px;
-      border: none;
-      border-radius: var(--border-radius);
-      cursor: pointer;
-      font-weight: 600;
-      transition: var(--transition);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .button-primary {
-      background-color: var(--success-color);
-      color: white;
-    }
-    
-    .button-primary:hover {
-      background-color: #3aa5d3;
-      transform: translateY(-2px);
-    }
-    
-    .button-secondary {
-      background-color: #e9ecef;
-      color: var(--dark-color);
-    }
-    
-    .button-secondary:hover {
-      background-color: #dee2e6;
-    }
-    
-    .button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-    }
-    
-    .button i {
-      margin-right: 8px;
-    }
-    
-    .text-controls {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-    
-    .text-style-input {
-      padding: 8px 12px;
-      border: 1px solid #ced4da;
-      border-radius: var(--border-radius);
-      font-size: 0.9rem;
-    }
-    
-    .color-input {
-      width: 40px;
-      height: 40px;
-      padding: 5px;
-      border: 1px solid #ced4da;
-      border-radius: var(--border-radius);
-      cursor: pointer;
-    }
-    
-    .preview-section {
-      background-color: white;
-      padding: 30px;
-      border-radius: var(--border-radius);
-      box-shadow: var(--box-shadow);
-      margin-bottom: 30px;
-    }
-    
-    .section-title {
-      font-size: 1.5rem;
-      margin-bottom: 20px;
-      padding-bottom: 10px;
-      border-bottom: 2px solid #e9ecef;
-    }
-    
-    #preview {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 30px;
-      justify-content: center;
-    }
-    
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    #preview { display: flex; flex-wrap: wrap; gap: 20px; }
     .canvas-container {
       position: relative;
-      display: inline-block;
-      border: 1px solid #e9ecef;
-      padding: 15px;
-      border-radius: var(--border-radius);
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-      margin-bottom: 20px;
-      background: white;
-      max-width: 100%;
+      border: 1px solid #ccc;
+      padding: 10px;
+      max-width: 100%; /* Responsive */
+      overflow: hidden;
     }
-    
-    .canvas-container canvas {
-      max-width: 100%;
+    canvas {
+      max-width: 100%; /* Resize canvas on mobile */
       height: auto;
       display: block;
     }
-    
     .text-label {
       position: absolute;
-      top: 20px;
-      left: 20px;
-      color: var(--accent-color);
-      font-size: 24px;
+      top: 20px; left: 20px;
+      color: red;
+      font-size: 18px;
       cursor: move;
-      user-select: none;
-      padding: 5px;
-      border: 1px dashed transparent;
-      transition: var(--transition);
-      max-width: calc(100% - 40px);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
     }
-    
-    .text-label:hover {
-      border-color: var(--accent-color);
-      background-color: rgba(247, 37, 133, 0.1);
-    }
-    
-    .text-input-container {
-      margin-top: 15px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    
     .text-input {
-      padding: 10px;
-      border: 1px solid #ced4da;
-      border-radius: var(--border-radius);
-      font-size: 1rem;
+      margin-top: 8px;
       width: 100%;
     }
-    
-    .empty-state {
-      text-align: center;
-      padding: 40px 0;
-      color: #6c757d;
-    }
-    
-    .empty-state i {
-      font-size: 3rem;
-      margin-bottom: 15px;
-      opacity: 0.5;
-    }
-    
-    .empty-state p {
-      font-size: 1.2rem;
-    }
-    
-    footer {
-      text-align: center;
-      padding: 20px 0;
-      color: #6c757d;
-      font-size: 0.9rem;
-    }
-    
-    .notification {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      padding: 15px 20px;
-      background-color: white;
-      border-left: 4px solid var(--success-color);
-      border-radius: var(--border-radius);
-      box-shadow: var(--box-shadow);
-      transform: translateX(100%);
-      transition: transform 0.3s ease;
-      z-index: 1000;
-      max-width: 80%;
-    }
-    
-    .notification.show {
-      transform: translateX(0);
-    }
-    
-    /* Mobile Responsive Styles */
-    @media (max-width: 768px) {
-      .container {
-        padding: 15px;
-      }
-      
-      header {
-        padding: 15px 0;
-        margin-bottom: 20px;
-      }
-      
-      h1 {
-        font-size: 2rem;
-      }
-      
-      .subtitle {
-        font-size: 1rem;
-      }
-      
-      .upload-section, .preview-section {
-        padding: 20px;
-      }
-      
-      .controls-section {
-        flex-direction: column;
-        align-items: stretch;
-      }
-      
-      .text-controls {
-        flex-wrap: wrap;
-        justify-content: center;
-        margin-bottom: 15px;
-      }
-      
-      .button {
-        width: 100%;
-        margin-bottom: 10px;
-      }
-      
-      #preview {
-        gap: 20px;
-      }
-      
-      .canvas-container {
-        width: 100%;
-        padding: 10px;
-      }
-      
-      .text-label {
-        font-size: 18px;
-        top: 15px;
-        left: 15px;
-      }
-      
-      .section-title {
-        font-size: 1.3rem;
-      }
-    }
-    
-    @media (max-width: 480px) {
-      h1 {
-        font-size: 1.8rem;
-      }
-      
-      .file-input-button {
-        padding: 10px 20px;
-        font-size: 0.9rem;
-      }
-      
-      .text-style-input, .text-input {
-        font-size: 16px; /* Prevents zoom on iOS */
-      }
-      
-      .text-label {
-        font-size: 16px;
-      }
-    }
   </style>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>ក្រុមហ៊ុនកាក់</h1>
-      <p class="subtitle">បម្លែងរូបភាពជា File</p>
-    </header>
-    
-    <section class="upload-section">
-      <div class="file-input-wrapper">
-        <div class="file-input-button">
-          <i class="fas fa-upload"></i> រេីសរូបភាព
-        </div>
-        <input type="file" id="images" multiple accept="image/*">
-      </div>
-      <div class="selected-files" id="file-count">មិនទាន់រេីស</div>
-    </section>
-    
-    <section class="preview-section">
-      <h2 class="section-title">Image Preview</h2>
-      <div id="preview">
-        <div class="empty-state">
-          <i class="fas fa-images"></i>
-          <p>រេីសរូបភាពដេីម្បីចាប់ផ្ដេីម</p>
-        </div>
-      </div>
-    </section>
-    
-    <div class="controls-section">
-      <div class="text-controls">
-        <select id="font-family" class="text-style-input">
-          <option value="Arial">Arial</option>
-          <option value="Times New Roman">Times New Roman</option>
-          <option value="Courier New">Courier New</option>
-          <option value="Georgia">Georgia</option>
-          <option value="Verdana">Verdana</option>
-        </select>
-        <select id="font-size" class="text-style-input">
-          <option value="16">16px</option>
-          <option value="20">20px</option>
-          <option value="24" selected>24px</option>
-          <option value="32">32px</option>
-          <option value="40">40px</option>
-        </select>
-        <input type="color" id="text-color" class="color-input" value="#f72585">
-      </div>
-      
-      <div>
-        <button id="reset" class="button button-secondary" disabled>
-          <i class="fas fa-redo"></i> Reset All
-        </button>
-        <button id="download" class="button button-primary" disabled>
-          <i class="fas fa-file-pdf"></i> Download PDF
-        </button>
-      </div>
-    </div>
-  </div>
+
+  <h2>Upload Images → Add Text → Download PDF</h2>
+  <input type="file" id="images" multiple accept="image/*">
+  <button id="download">Download PDF</button>
   
-  <footer>
-    <p>© 2023 Image to PDF Converter | Professional Tool</p>
-  </footer>
-  
-  <div class="notification" id="notification">
-    <p>Your PDF has been downloaded successfully!</p>
-  </div>
+  <div id="preview"></div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
     const { jsPDF } = window.jspdf;
     let items = [];
-    let currentFont = 'Arial';
-    let currentFontSize = 24;
-    let currentColor = '#f72585';
 
     document.getElementById("images").addEventListener("change", handleFiles);
-    document.getElementById("download").addEventListener("click", downloadPDF);
-    document.getElementById("reset").addEventListener("click", resetAll);
-    document.getElementById("font-family").addEventListener("change", (e) => {
-      currentFont = e.target.value;
-      updateTextStyles();
-    });
-    document.getElementById("font-size").addEventListener("change", (e) => {
-      currentFontSize = parseInt(e.target.value);
-      updateTextStyles();
-    });
-    document.getElementById("text-color").addEventListener("change", (e) => {
-      currentColor = e.target.value;
-      updateTextStyles();
-    });
 
     function handleFiles(event) {
       const files = event.target.files;
       const preview = document.getElementById("preview");
-      
-      if (!files || files.length === 0) return;
-      
-      // Update file count
-      document.getElementById("file-count").textContent = 
-        `${files.length} file${files.length > 1 ? 's' : ''} selected`;
-      
-      // Enable buttons
-      document.getElementById("download").disabled = false;
-      document.getElementById("reset").disabled = false;
-      
-      // Clear preview area
-      preview.innerHTML = "";
-      items = [];
-      
-      // Process each file
-      Array.from(files).forEach((file, index) => {
-        // Check if file is an image
-        if (!file.type.match('image.*')) {
-          showNotification('Please select only image files', 'error');
-          return;
-        }
-        
+
+      Array.from(files).forEach(file => {
         const reader = new FileReader();
         reader.onload = e => {
           const img = new Image();
           img.onload = () => {
-            // Create canvas with dimensions optimized for mobile
+            // scale down if image is huge (mobile fix)
+            const maxWidth = 400;
+            const scale = img.width > maxWidth ? maxWidth / img.width : 1;
+            const displayWidth = img.width * scale;
+            const displayHeight = img.height * scale;
+
             const canvas = document.createElement("canvas");
             const ctx = canvas.getContext("2d");
-            
-            // Calculate dimensions for mobile display
-            const maxWidth = Math.min(400, window.innerWidth - 60); // Account for padding
-            const ratio = maxWidth / img.width;
-            const displayWidth = maxWidth;
-            const displayHeight = img.height * ratio;
-            
             canvas.width = displayWidth;
             canvas.height = displayHeight;
-            
-            // Draw image on canvas with proper dimensions
             ctx.drawImage(img, 0, 0, displayWidth, displayHeight);
-            
-            // Create container for canvas and controls
+
             const container = document.createElement("div");
             container.className = "canvas-container";
-            
-            // Create draggable text element
+            container.style.width = displayWidth + "px";
+
             const textDiv = document.createElement("div");
             textDiv.className = "text-label";
             textDiv.textContent = "Your Text";
-            textDiv.style.fontFamily = currentFont;
-            textDiv.style.fontSize = currentFontSize + 'px';
-            textDiv.style.color = currentColor;
-            
-            // Create text input
-            const inputContainer = document.createElement("div");
-            inputContainer.className = "text-input-container";
-            
+
+            // text input for each image
             const input = document.createElement("input");
             input.type = "text";
             input.className = "text-input";
             input.placeholder = "Enter text for this image...";
             input.value = "Your Text";
             input.addEventListener("input", () => {
-              textDiv.textContent = input.value || "Your Text";
+              textDiv.textContent = input.value;
             });
-            
-            // Setup dragging functionality
-            setupDragging(textDiv, container);
-            
-            // Append elements to container
+
+            // Dragging text
+            let offsetX, offsetY, isDragging = false;
+            textDiv.addEventListener("mousedown", e => {
+              isDragging = true;
+              offsetX = e.offsetX;
+              offsetY = e.offsetY;
+            });
+            document.addEventListener("mousemove", e => {
+              if (isDragging) {
+                textDiv.style.left = (e.pageX - container.offsetLeft - offsetX) + "px";
+                textDiv.style.top = (e.pageY - container.offsetTop - offsetY) + "px";
+              }
+            });
+            document.addEventListener("mouseup", () => isDragging = false);
+
             container.appendChild(canvas);
             container.appendChild(textDiv);
-            inputContainer.appendChild(input);
-            container.appendChild(inputContainer);
-            
-            // Add to preview
+            container.appendChild(input);
             preview.appendChild(container);
-            
-            // Store reference
-            items.push({ 
-              canvas, 
-              textDiv, 
-              input, 
-              img,
-              originalWidth: img.width,
-              originalHeight: img.height,
-              displayWidth,
-              displayHeight
-            });
+
+            items.push({ canvas, textDiv, input, img, displayWidth, displayHeight });
           };
           img.src = e.target.result;
-        };
-        reader.onerror = () => {
-          showNotification('Error reading file: ' + file.name, 'error');
         };
         reader.readAsDataURL(file);
       });
     }
-    
-    function setupDragging(textDiv, container) {
-      let offsetX, offsetY, isDragging = false;
-      
-      textDiv.addEventListener("mousedown", e => {
-        isDragging = true;
-        offsetX = e.offsetX;
-        offsetY = e.offsetY;
-        textDiv.style.cursor = "grabbing";
-        e.preventDefault();
+
+    document.getElementById("download").addEventListener("click", () => {
+      const pdf = new jsPDF();
+
+      items.forEach((item, index) => {
+        const { canvas, textDiv, input, img, displayWidth, displayHeight } = item;
+        const ctx = canvas.getContext("2d");
+
+        // redraw image clean
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, displayWidth, displayHeight);
+
+        // draw text
+        ctx.font = "20px Arial";
+        ctx.fillStyle = "red";
+        let x = parseInt(textDiv.style.left) || 50;
+        let y = parseInt(textDiv.style.top) || 50;
+        ctx.fillText(input.value, x, y);
+
+        const imgData = canvas.toDataURL("image/jpeg", 1.0);
+        if (index > 0) pdf.addPage();
+        pdf.addImage(imgData, "JPEG", 10, 10, 190, 0); // fit to page width
       });
-      
-      document.addEventListener("mousemove", e => {
-        if (!isDragging) return;
-        
-        const containerRect = container.getBoundingClientRect();
-        const x = e.clientX - containerRect.left - offsetX;
-        const y = e.clientY - containerRect.top - offsetY;
-        
-        // Constrain text within canvas bounds
-        const maxX = containerRect.width - textDiv.offsetWidth;
-        const maxY = containerRect.height - textDiv.offsetHeight - 40; // Account for input field
-        
-        textDiv.style.left = Math.max(0, Math.min(x, maxX)) + "px";
-        textDiv.style.top = Math.max(0, Math.min(y, maxY)) + "px";
-      });
-      
-      document.addEventListener("mouseup", () => {
-        isDragging = false;
-        textDiv.style.cursor = "grab";
-      });
-      
-      // Touch events for mobile
-      textDiv.addEventListener("touchstart", e => {
-        isDragging = true;
-        const touch = e.touches[0];
-        const rect = textDiv.getBoundingClientRect();
-        offsetX = touch.clientX - rect.left;
-        offsetY = touch.clientY - rect.top;
-        textDiv.style.cursor = "grabbing";
-        e.preventDefault();
-      }, { passive: false });
-      
-      document.addEventListener("touchmove", e => {
-        if (!isDragging) return;
-        
-        const touch = e.touches[0];
-        const containerRect = container.getBoundingClientRect();
-        const x = touch.clientX - containerRect.left - offsetX;
-        const y = touch.clientY - containerRect.top - offsetY;
-        
-        // Constrain text within canvas bounds
-        const maxX = containerRect.width - textDiv.offsetWidth;
-        const maxY = containerRect.height - textDiv.offsetHeight - 40;
-        
-        textDiv.style.left = Math.max(0, Math.min(x, maxX)) + "px";
-        textDiv.style.top = Math.max(0, Math.min(y, maxY)) + "px";
-        
-        e.preventDefault();
-      }, { passive: false });
-      
-      document.addEventListener("touchend", () => {
-        isDragging = false;
-        textDiv.style.cursor = "grab";
-      });
-    }
-    
-    function updateTextStyles() {
-      items.forEach(item => {
-        item.textDiv.style.fontFamily = currentFont;
-        item.textDiv.style.fontSize = currentFontSize + 'px';
-        item.textDiv.style.color = currentColor;
-      });
-    }
-    
-    function downloadPDF() {
-      if (items.length === 0) {
-        showNotification('Please upload at least one image', 'error');
-        return;
-      }
-      
-      try {
-        const pdf = new jsPDF();
-        const padding = 10;
-        
-        items.forEach((item, index) => {
-          const { img, textDiv, input, originalWidth, originalHeight } = item;
-          
-          // Create a temporary canvas with original dimensions for PDF quality
-          const tempCanvas = document.createElement("canvas");
-          const tempCtx = tempCanvas.getContext("2d");
-          tempCanvas.width = originalWidth;
-          tempCanvas.height = originalHeight;
-          
-          // Draw image on temp canvas
-          tempCtx.drawImage(img, 0, 0, originalWidth, originalHeight);
-          
-          // Calculate text position based on drag position (scaled from display to original)
-          const displayRect = item.canvas.getBoundingClientRect();
-          const textXDisplay = parseInt(textDiv.style.left) || 20;
-          const textYDisplay = parseInt(textDiv.style.top) || 20;
-          
-          // Scale text position from display size to original size
-          const scaleX = originalWidth / item.displayWidth;
-          const scaleY = originalHeight / item.displayHeight;
-          const textX = textXDisplay * scaleX;
-          const textY = textYDisplay * scaleY;
-          
-          // Scale font size for original image dimensions
-          const scaledFontSize = currentFontSize * scaleX;
-          
-          // Draw text on temp canvas
-          tempCtx.font = `${scaledFontSize}px ${currentFont}`;
-          tempCtx.fillStyle = currentColor;
-          tempCtx.fillText(input.value || "Your Text", textX, textY);
-          
-          // Convert to data URL
-          const imgData = tempCanvas.toDataURL("image/jpeg", 0.9);
-          
-          // Add to PDF
-          if (index > 0) pdf.addPage();
-          
-          // Calculate dimensions to fit in PDF page (A4: 210x297mm)
-          const pdfWidth = pdf.internal.pageSize.getWidth();
-          const pdfHeight = pdf.internal.pageSize.getHeight();
-          
-          // Maintain aspect ratio
-          const ratio = Math.min(
-            (pdfWidth - padding * 2) / originalWidth,
-            (pdfHeight - padding * 2) / originalHeight
-          );
-          
-          const width = originalWidth * ratio;
-          const height = originalHeight * ratio;
-          
-          const x = (pdfWidth - width) / 2;
-          const y = (pdfHeight - height) / 2;
-          
-          pdf.addImage(imgData, "JPEG", x, y, width, height);
-        });
-        
-        // Download the PDF
-        pdf.save("document.pdf");
-        showNotification('PDF downloaded successfully!');
-        
-      } catch (error) {
-        console.error("Error generating PDF:", error);
-        showNotification('Error generating PDF. Please try again.', 'error');
-      }
-    }
-    
-    function resetAll() {
-      document.getElementById("images").value = "";
-      document.getElementById("preview").innerHTML = `
-        <div class="empty-state">
-          <i class="fas fa-images"></i>
-          <p>Upload images to get started</p>
-        </div>
-      `;
-      document.getElementById("file-count").textContent = "No files selected";
-      document.getElementById("download").disabled = true;
-      document.getElementById("reset").disabled = true;
-      items = [];
-    }
-    
-    function showNotification(message, type = 'success') {
-      const notification = document.getElementById("notification");
-      notification.innerHTML = `<p>${message}</p>`;
-      notification.className = `notification ${type}`;
-      notification.classList.add("show");
-      
-      setTimeout(() => {
-        notification.classList.remove("show");
-      }, 3000);
-    }
+
+      pdf.save("images.pdf");
+    });
   </script>
 </body>
 </html>
